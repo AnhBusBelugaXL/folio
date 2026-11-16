@@ -856,6 +856,7 @@ function deleteBook(bookId) {
 
 
 let currentMusicURL = null;
+let mediaSessionSupported = 'mediaSession' in navigator;
 
 function importMusic() {
     document.getElementById("musicInput").click();
@@ -992,6 +993,44 @@ function playMusic(songId, fromShuffle = false) {
 
         audio.src = currentMusicURL;
         document.getElementById("nowPlaying").textContent = song.name;
+        if (mediaSessionSupported) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+                title: song.name,
+                artist: "Folio",
+                album: "Your Music"
+            });
+
+            navigator.mediaSession.setActionHandler("play", () => {
+                audio.play();
+            });
+
+            navigator.mediaSession.setActionHandler("pause", () => {
+                audio.pause();
+            });
+            navigator.mediaSession.setActionHandler("nexttrack", () => {
+                if (shuffleEnabled && shuffleQueue.length > 0) {
+                    const nextSong = shuffleQueue.shift();
+                    playMusic(nextSong.id, true);
+                } else if (!shuffleEnabled) {
+                    const currentIndex = musicSongs.findIndex(
+                        song => song.id === currentSongId
+                    );
+
+                    if (currentIndex !== -1 && currentIndex < musicSongs.length - 1) {
+                        playMusic(musicSongs[currentIndex + 1].id);
+                    }
+                }
+            });
+            navigator.mediaSession.setActionHandler("previoustrack", () => {
+                const currentIndex = musicSongs.findIndex(
+                    song => song.id === currentSongId
+                );
+
+                if (currentIndex > 0) {
+                    playMusic(musicSongs[currentIndex - 1].id);
+                }
+            });
+        }
         document.getElementById("musicPlayer").style.display = "block";
 
         audio.play();
