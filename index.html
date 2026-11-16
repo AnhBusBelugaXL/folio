@@ -365,14 +365,7 @@ button {
     <button onclick="importMusic()">+ Import</button>
   </div>
 
-  <input
-    type="file"
-    id="musicInput"
-    accept=".mp3,.m4a,.wav,.aac,.mp4,audio/*"
-    multiple
-    style="display:none"
-    onchange="handleMusicImport(event)"
-  />
+  <input type="file" id="musicInput" multiple style="display:none" onchange="handleMusicImport(event)">
 
   <div id="musicList" class="music-list"></div>
 

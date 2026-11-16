@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "folio-v1";
+const CACHE_NAME = "folio-v2";
 
 const FILES_TO_CACHE = [
     "./",
