@@ -368,7 +368,7 @@ button {
   <input
     type="file"
     id="musicInput"
-    accept="audio/*"
+    accept=".mp3,.m4a,.wav,.aac,.mp4,audio/*"
     multiple
     style="display:none"
     onchange="handleMusicImport(event)"
@@ -860,19 +860,33 @@ let currentMusicURL = null;
 let mediaSessionSupported = 'mediaSession' in navigator;
 
 function importMusic() {
-    document.getElementById("musicInput").click();
+    const input = document.getElementById("musicInput");
+    input.value = "";
+    input.click();
 }
+
 
 function handleMusicImport(event) {
     const files = Array.from(event.target.files);
 
     if (files.length === 0) return;
 
+    const audioFiles = files.filter(file =>
+        file.type.startsWith("audio/") ||
+        /\.(mp3|m4a|wav|aac|ogg|flac)$/i.test(file.name)
+    );
+
+    if (audioFiles.length === 0) {
+        alert("Please select a valid audio file.");
+        event.target.value = "";
+        return;
+    }
+
     const db = dbRequest.result;
     const transaction = db.transaction(["music"], "readwrite");
     const store = transaction.objectStore("music");
 
-    files.forEach(file => {
+    audioFiles.forEach(file => {
         store.add({
             name: file.name,
             data: file
@@ -888,6 +902,7 @@ function handleMusicImport(event) {
         alert("Couldn't import your music. Try again.");
     };
 }
+
 
 function displayMusic() {
     const db = dbRequest.result;
